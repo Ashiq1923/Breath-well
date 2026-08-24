@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Breathe Well</title>
+<style>
+  :root{
+    --bg1:#0a1a4a;
+    --cyan:#3ee6e0;
+    --card:#132a70;
+    --card2:#1a3585;
+    --text:#eaf1ff;
+    --muted:#9fb3e8;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{height:100%;}
+  body{
+    font-family:'Segoe UI', system-ui, -apple-system, sans-serif;
+    background:#05081a;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:100vh;
+    padding:24px;
+  }
+
+  .phone{
+    width:390px;
+    max-width:100%;
+    border-radius:44px;
+    padding:14px;
+    background:linear-gradient(160deg, #061024, #0a1230);
+    box-shadow:0 40px 80px rgba(0,0,20,0.6), inset 0 0 0 2px #1a2450;
+  }
+
+  .screen{
+    position:relative;
+    border-radius:32px;
+    overflow:hidden;
+    background:
+      radial-gradient(circle at 50% -10%, #1c4fd6 0%, transparent 55%),
+      linear-gradient(180deg, var(--bg1) 0%, #071033 55%, #060c26 100%);
+    padding:22px 22px 26px;
+    color:var(--text);
+    min-height:900px;
+  }
+
+  .statusbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:15px;
+    font-weight:600;
+    color:#dfe8ff;
+    margin-bottom:14px;
+    opacity:0.85;
+  }
+
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:4px;
+  }
+  .icon-btn{
+    width:42px;height:42px;border-radius:50%;
+    background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.08);
+    display:flex;align-items:center;justify-content:center;
+    color:#cfe0ff;
+    cursor:pointer;
+    transition:background .2s;
+  }
+  .icon-btn:hover{background:rgba(255,255,255,0.12);}
+
+  .title-block{text-align:center;}
+  .title-block h1{
+    font-size:22px;
+    letter-spacing:0.3px;
+    background:linear-gradient(90deg,#fff,#c9d8ff);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  .title-block p{
+    font-size:12.5px;
+    color:var(--muted);
+    margin-top:2px;
+    letter-spacing:0.5px;
+  }
+
+  .lungs-stage{
+    position:relative;
+    height:170px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:20px 0 4px;
+    perspective:600px;
+  }
+  .lungs-glow{
+    position:absolute;
+    width:210px;height:170px;
+    left:50%; top:50%;
+    transform:translate(-50%,-50%) scale(0.75);
+    background:radial-gradient(circle, rgba(62,230,224,0.5) 0%, rgba(62,230,224,0) 70%);
+    filter:blur(6px);
+    opacity:0.35;
+    z-index:1;
+    transition-property: transform, opacity;
+    transition-timing-function: ease-in-out;
+    transition-duration: .6s;
+  }
+  .lungs-wrap{
+    position:relative;
+    z-index:2;
+  }
+  .lungs-wrap svg{
+    display:block;
+    transform:scale(0.85) translateY(6px);
+    filter:drop-shadow(0 0 14px rgba(62,230,224,0.3)) brightness(0.9);
+    transition-property: transform, filter;
+    transition-timing-function: ease-in-out;
+    transition-duration: .6s;
+  }
+
+  .ring-wrap{
+    position:relative;
+    width:230px;height:230px;
+    margin:14px auto 20px;
+  }
+  .ring-wrap svg{ width:100%; height:100%; transform:rotate(-90deg); }
+  .ring-bg{ fill:none; stroke:rgba(255,255,255,0.08); stroke-width:10; }
+  .ring-fg{
+    fill:none;
+    stroke:url(#ringGrad);
+    stroke-width:10;
+    stroke-linecap:round;
+    transition-property: stroke-dashoffset;
+    transition-timing-function: linear;
+    transition-duration: .6s;
+  }
+  .ring-center{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:6px;
+  }
+  .ring-icon{
+    width:34px;height:34px;border-radius:50%;
+    background:rgba(62,230,224,0.15);
+    display:flex;align-items:center;justify-content:center;
+    color:var(--cyan);
+    margin-bottom:2px;
+  }
+  .phase-label{
+    font-size:24px;
+    font-weight:700;
+    background:linear-gradient(90deg,#fff,var(--cyan));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    text-align:center;
+  }
+  .phase-sub{ font-size:12.5px; color:var(--muted); text-align:center; padding:0 18px;}
+  .phase-timer{ font-size:14px; font-weight:600; color:#dff; letter-spacing:0.5px; }
+
+  .steps{
+    display:flex;
+    justify-content:space-between;
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.06);
+    border-radius:20px;
+    padding:16px 10px;
+    margin-bottom:16px;
+  }
+  .step{
+    flex:1;
+    text-align:center;
+    position:relative;
+  }
+  .step .dot{
+    width:22px;height:22px;border-radius:50%;
+    background:rgba(255,255,255,0.15);
+    margin:0 auto 8px;
+    transition:all .3s;
+  }
+  .step.active .dot{
+    background:var(--cyan);
+    box-shadow:0 0 14px rgba(62,230,224,0.8);
+  }
+  .step .label{ font-size:13px; font-weight:600; color:#e6edff; }
+  .step .sub{ font-size:11.5px; color:var(--muted); margin-top:2px; }
+  .step.active .label{ color:var(--cyan); }
+
+  /* ---- Lung Health / Test card (three states) ---- */
+  .health-card{
+    background:linear-gradient(135deg, var(--card), var(--card2));
+    border:1px solid rgba(255,255,255,0.07);
+    border-radius:20px;
+    padding:16px;
+    margin-bottom:16px;
+    min-height:88px;
+  }
+
+  .hc-idle{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    cursor:pointer;
+  }
+  .hc-idle-icon{
+    width:54px;height:54px;border-radius:50%;
+    background:rgba(62,230,224,0.14);
+    display:flex;align-items:center;justify-content:center;
+    font-size:24px;
+    flex-shrink:0;
+  }
+  .hc-idle-text{ flex:1; }
+  .hc-idle-text h3{ font-size:14.5px; margin-bottom:3px; }
+  .hc-idle-text p{ font-size:11.5px; color:var(--muted); line-height:1.4; }
+  .hc-idle-cta{
+    flex-shrink:0;
+    padding:10px 14px;
+    border-radius:20px;
+    background:linear-gradient(90deg,#22e2c9,#38b6ff);
+    color:#031424;
+    font-size:12px;
+    font-weight:700;
+    white-space:nowrap;
+  }
+
+  .hc-running{ display:none; }
+  .hc-run-title{
+    font-size:13.5px; font-weight:600; color:#eaf1ff;
+    display:flex; align-items:center; gap:7px; margin-bottom:12px;
+  }
+  .dotpulse{
+    width:8px;height:8px;border-radius:50%;background:var(--cyan);
+    box-shadow:0 0 8px var(--cyan); animation:pulse 1.2s infinite;
+  }
+  @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:.25;} }
+  .hc-run-stats{ display:flex; gap:26px; margin-bottom:12px; }
+  .hc-stat{ display:flex; align-items:baseline; gap:4px; }
+  .hc-stat-num{ font-size:21px; font-weight:800; color:var(--cyan); }
+  .hc-stat-label{ font-size:11px; color:var(--muted); }
+  .hc-bar{ height:6px; border-radius:6px; background:rgba(255,255,255,0.08); overflow:hidden; margin-bottom:14px; }
+  .hc-bar-fill{ height:100%; width:0%; background:linear-gradient(90deg,#2fd8d0,#3ea0ff); transition:width .6s ease; }
+  .hc-stop-btn{
+    width:100%;
+    padding:11px;
+    border:none;
+    border-radius:20px;
+    background:linear-gradient(90deg,#ff7a7a,#ffb26b);
+    color:#2a0a0a;
+    font-weight:700;
+    font-size:13.5px;
+    cursor:pointer;
+    transition:transform .15s;
+  }
+  .hc-stop-btn:active{ transform:scale(0.98); }
+
+  .hc-result{ display:none; }
+  .hc-result-row{ display:flex; align-items:center; gap:14px; }
+  .health-ring{ width:64px;height:64px; position:relative; flex-shrink:0; }
+  .health-ring svg{ transform:rotate(-90deg); width:100%; height:100%; }
+  .health-ring .bg{ fill:none; stroke:rgba(255,255,255,0.1); stroke-width:6; }
+  .health-ring .fg{
+    fill:none; stroke:var(--cyan); stroke-width:6; stroke-linecap:round;
+    transition:stroke-dashoffset .8s ease;
+  }
+  .health-ring .pct{
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    font-size:14px; font-weight:800;
+  }
+  .hc-badge{
+    display:inline-block;
+    font-size:10.5px; font-weight:700;
+    padding:2px 9px; border-radius:10px;
+    margin-bottom:4px;
+    background:rgba(62,230,224,0.15);
+    color:var(--cyan);
+  }
+  .hc-result-title{ font-size:13.5px; font-weight:600; color:#eaf1ff; }
+  .hc-result-desc{ font-size:11.5px; color:var(--muted); line-height:1.5; margin-top:10px; }
+  .hc-retry-btn{
+    width:100%;
+    margin-top:12px;
+    padding:10px;
+    border-radius:18px;
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.14);
+    color:#eaf1ff;
+    font-size:12.5px;
+    font-weight:600;
+    cursor:pointer;
+    transition:background .2s;
+  }
+  .hc-retry-btn:hover{ background:rgba(255,255,255,0.14); }
+
+  .level-picker{
+    margin-bottom:16px;
+  }
+  .level-picker label{
+    display:block;
+    font-size:12px;
+    color:var(--muted);
+    margin-bottom:6px;
+    letter-spacing:0.4px;
+  }
+  .level-picker select{
+    width:100%;
+    padding:13px 14px;
+    border-radius:16px;
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.1);
+    color:var(--text);
+    font-size:14px;
+    font-weight:600;
+    appearance:none;
+    -webkit-appearance:none;
+    background-image:linear-gradient(45deg, transparent 50%, var(--cyan) 50%), linear-gradient(135deg, var(--cyan) 50%, transparent 50%);
+    background-position: calc(100% - 20px) center, calc(100% - 15px) center;
+    background-size: 5px 5px, 5px 5px;
+    background-repeat:no-repeat;
+    cursor:pointer;
+  }
+  .level-picker select:focus{ outline:2px solid var(--cyan); }
+  .level-picker select:disabled{ opacity:.5; cursor:not-allowed; }
+  .level-picker option{ background:#0e1a44; color:#eaf1ff; }
+
+  .btn-row{
+    display:flex;
+    gap:10px;
+  }
+  .reset-btn{
+    width:54px;
+    flex-shrink:0;
+    border:1px solid rgba(255,255,255,0.14);
+    border-radius:30px;
+    background:rgba(255,255,255,0.05);
+    color:#cfe0ff;
+    font-size:19px;
+    cursor:pointer;
+    transition:transform .15s, background .2s;
+  }
+  .reset-btn:hover{ background:rgba(255,255,255,0.12); }
+  .reset-btn:active{ transform:scale(0.94) rotate(-90deg); }
+
+  .session-btn{
+    flex:1;
+    padding:16px;
+    border:none;
+    border-radius:30px;
+    background:linear-gradient(90deg, #22e2c9, #38b6ff);
+    color:#031424;
+    font-size:15px;
+    font-weight:700;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    cursor:pointer;
+    box-shadow:0 10px 30px rgba(56,182,255,0.35);
+    transition:transform .15s, opacity .2s;
+  }
+  .session-btn:active{ transform:scale(0.98); }
+  .session-btn:disabled{
+    opacity:.4;
+    cursor:not-allowed;
+    box-shadow:none;
+  }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="screen">
+    <div class="statusbar">
+      <span id="clock">4:47</span>
+      <span>📶 🔋</span>
+    </div>
+
+    <div class="topbar">
+      <div class="icon-btn">☰</div>
+      <div class="title-block">
+        <h1>Breathe Well</h1>
+        <p>Breath. Hold. Relax.</p>
+      </div>
+      <div class="icon-btn">⚙</div>
+    </div>
+
+    <div class="lungs-stage">
+      <div class="lungs-glow" id="lungsGlow"></div>
+      <div class="lungs-wrap" id="lungsWrap">
+        <svg width="190" height="160" viewBox="0 0 200 170">
+          <defs>
+            <linearGradient id="lungGradL" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#5fc7ff"/>
+              <stop offset="100%" stop-color="#1e57c9"/>
+            </linearGradient>
+            <linearGradient id="lungGradR" x1="100%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#5fc7ff"/>
+              <stop offset="100%" stop-color="#1e57c9"/>
+            </linearGradient>
+            <linearGradient id="tracheaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#7bf3ec"/>
+              <stop offset="100%" stop-color="#2fd8d0"/>
+            </linearGradient>
+          </defs>
+
+          <rect x="94" y="8" width="12" height="55" rx="6" fill="url(#tracheaGrad)"/>
+          <line x1="94" y1="18" x2="106" y2="18" stroke="#0a1a4a" stroke-width="1.4" opacity="0.35"/>
+          <line x1="94" y1="28" x2="106" y2="28" stroke="#0a1a4a" stroke-width="1.4" opacity="0.35"/>
+          <line x1="94" y1="38" x2="106" y2="38" stroke="#0a1a4a" stroke-width="1.4" opacity="0.35"/>
+          <line x1="94" y1="48" x2="106" y2="48" stroke="#0a1a4a" stroke-width="1.4" opacity="0.35"/>
+
+          <path d="M96 62 C 58 70, 22 58, 12 96 C 0 142, 34 164, 68 140 C 90 124, 95 96, 96 74 Z" fill="url(#lungGradL)"/>
+          <path d="M104 62 C 142 70, 178 58, 188 96 C 200 142, 166 164, 132 140 C 110 124, 105 96, 104 74 Z" fill="url(#lungGradR)"/>
+
+          <path d="M95 76 C 74 86, 54 87, 38 100 M58 99 C 44 108, 34 112, 20 123 M69 115 C 54 123, 44 129, 30 140"
+                stroke="#eafffd" stroke-width="1.8" fill="none" opacity="0.55" stroke-linecap="round"/>
+          <path d="M105 76 C 126 86, 146 87, 162 100 M142 99 C 156 108, 166 112, 180 123 M131 115 C 146 123, 156 129, 170 140"
+                stroke="#eafffd" stroke-width="1.8" fill="none" opacity="0.55" stroke-linecap="round"/>
+
+          <ellipse cx="52" cy="92" rx="13" ry="24" fill="#ffffff" opacity="0.14"/>
+          <ellipse cx="148" cy="92" rx="13" ry="24" fill="#ffffff" opacity="0.14"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="ring-wrap">
+      <svg viewBox="0 0 220 220">
+        <defs>
+          <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#2fd8d0"/>
+            <stop offset="100%" stop-color="#3ea0ff"/>
+          </linearGradient>
+        </defs>
+        <circle class="ring-bg" cx="110" cy="110" r="100"></circle>
+        <circle class="ring-fg" id="ringFg" cx="110" cy="110" r="100"
+                stroke-dasharray="628.3" stroke-dashoffset="628.3"></circle>
+      </svg>
+      <div class="ring-center">
+        <div class="ring-icon">💨</div>
+        <div class="phase-label" id="phaseLabel">Ready</div>
+        <div class="phase-sub" id="phaseSub">Select a level & tap start</div>
+        <div class="phase-timer" id="phaseTimer">-- sec</div>
+      </div>
+    </div>
+
+    <div class="steps">
+      <div class="step" id="stepInhale">
+        <div class="dot"></div>
+        <div class="label">Inhale</div>
+        <div class="sub" id="subInhale">4 sec</div>
+      </div>
+      <div class="step" id="stepHold">
+        <div class="dot"></div>
+        <div class="label">Hold</div>
+        <div class="sub" id="subHold">4 sec</div>
+      </div>
+      <div class="step" id="stepExhale">
+        <div class="dot"></div>
+        <div class="label">Exhale</div>
+        <div class="sub" id="subExhale">6 sec</div>
+      </div>
+    </div>
+
+    <!-- Lung Health / Test card -->
+    <div class="health-card" id="healthCard">
+
+      <div class="hc-idle" id="hcIdle">
+        <div class="hc-idle-icon">🫁</div>
+        <div class="hc-idle-text">
+          <h3>Test Your Lungs</h3>
+          <p>Auto test runs all 5 levels, 10 reps each, then scores your lung health.</p>
+        </div>
+        <div class="hc-idle-cta">▶ Start</div>
+      </div>
+
+      <div class="hc-running" id="hcRunning">
+        <div class="hc-run-title"><span class="dotpulse"></span>Testing your lungs…</div>
+        <div class="hc-run-stats">
+          <div class="hc-stat"><span class="hc-stat-num" id="liveLevel">1</span><span class="hc-stat-label">/ 5 Level</span></div>
+          <div class="hc-stat"><span class="hc-stat-num" id="liveReps">0</span><span class="hc-stat-label">/ 10 Reps</span></div>
+        </div>
+        <div class="hc-bar"><div class="hc-bar-fill" id="hcBarFill"></div></div>
+        <button class="hc-stop-btn" id="stopTestBtn">⏹ Stop Test</button>
+      </div>
+
+      <div class="hc-result" id="hcResult">
+        <div class="hc-result-row">
+          <div class="health-ring">
+            <svg viewBox="0 0 64 64">
+              <circle class="bg" cx="32" cy="32" r="26"></circle>
+              <circle class="fg" id="healthFg" cx="32" cy="32" r="26"
+                      stroke-dasharray="163.4" stroke-dashoffset="163.4"></circle>
+            </svg>
+            <div class="pct" id="healthPctNum">0%</div>
+          </div>
+          <div>
+            <span class="hc-badge" id="hcBadge">Result</span>
+            <div class="hc-result-title" id="hcResultTitle">Stopped at Level 1 • Rep 0/10</div>
+          </div>
+        </div>
+        <p class="hc-result-desc" id="hcResultDesc">--</p>
+        <button class="hc-retry-btn" id="retryBtn">↻ Test Again</button>
+      </div>
+
+    </div>
+
+    <div class="level-picker">
+      <label for="levelSelect">Practice Level</label>
+      <select id="levelSelect">
+        <option value="0">Level 1 · Beginner (3-2-4)</option>
+        <option value="1">Level 2 · Easy (4-3-5)</option>
+        <option value="2" selected>Level 3 · Moderate (4-4-6)</option>
+        <option value="3">Level 4 · Advanced (5-5-7)</option>
+        <option value="4">Level 5 · Pro (6-7-9)</option>
+      </select>
+    </div>
+
+    <div class="btn-row">
+      <button class="reset-btn" id="resetBtn" title="Reset">↺</button>
+      <button class="session-btn" id="sessionBtn">▶ Start Session</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const LEVELS = [
+    { name:'Level 1 · Beginner', inhale:3, hold:2, exhale:4 },
+    { name:'Level 2 · Easy',     inhale:4, hold:3, exhale:5 },
+    { name:'Level 3 · Moderate', inhale:4, hold:4, exhale:6 },
+    { name:'Level 4 · Advanced', inhale:5, hold:5, exhale:7 },
+    { name:'Level 5 · Pro',      inhale:6, hold:7, exhale:9 },
+  ];
+  const REPS_PER_LEVEL = 10;
+  const MAX_WEIGHTED_SCORE = LEVELS.reduce((sum,_,i)=> sum + (i+1)*REPS_PER_LEVEL, 0); // 150
+
+  function buildPhases(levelIndex){
+    const lvl = LEVELS[levelIndex];
+    return [
+      { key:'inhale', label:'Breathe In', sub:'Inhale slowly',    duration:lvl.inhale, step:'stepInhale' },
+      { key:'hold',   label:'Hold',       sub:'Hold your breath', duration:lvl.hold,   step:'stepHold'   },
+      { key:'exhale', label:'Release',    sub:'Exhale slowly',    duration:lvl.exhale, step:'stepExhale' },
+    ];
+  }
+
+  let currentLevel = 2;
+  let PHASES = buildPhases(currentLevel);
+
+  const phaseLabel = document.getElementById('phaseLabel');
+  const phaseSub = document.getElementById('phaseSub');
+  const phaseTimer = document.getElementById('phaseTimer');
+  const ringFg = document.getElementById('ringFg');
+  const lungsWrap = document.getElementById('lungsWrap');
+  const lungsSvg = lungsWrap.querySelector('svg');
+  const lungsGlow = document.getElementById('lungsGlow');
+  const sessionBtn = document.getElementById('sessionBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const levelSelect = document.getElementById('levelSelect');
+  const clockEl = document.getElementById('clock');
+
+  const hcIdle = document.getElementById('hcIdle');
+  const hcRunning = document.getElementById('hcRunning');
+  const hcResult = document.getElementById('hcResult');
+  const liveLevel = document.getElementById('liveLevel');
+  const liveReps = document.getElementById('liveReps');
+  const hcBarFill = document.getElementById('hcBarFill');
+  const stopTestBtn = document.getElementById('stopTestBtn');
+  const retryBtn = document.getElementById('retryBtn');
+  const healthFg = document.getElementById('healthFg');
+  const healthPctNum = document.getElementById('healthPctNum');
+  const hcBadge = document.getElementById('hcBadge');
+  const hcResultTitle = document.getElementById('hcResultTitle');
+  const hcResultDesc = document.getElementById('hcResultDesc');
+
+  const CIRC = 2 * Math.PI * 100;
+  const HEALTH_CIRC = 2 * Math.PI * 26; // 163.36
+
+  let running = false;
+  let phaseIndex = -1;
+  let secondsLeft = 0;
+  let tickHandle = null;
+
+  // ---- Auto Level Test state ----
+  let testMode = false;
+  let testLevelIndex = 0; // level currently being practiced during the test (0-based)
+  let testRep = 0;        // reps completed so far within that level (0-9)
+
+  function updateClock(){
+    const now = new Date();
+    let h = now.getHours() % 12; if(h===0) h = 12;
+    const m = now.getMinutes().toString().padStart(2,'0');
+    clockEl.textContent = `${h}:${m}`;
+  }
+  updateClock();
+  setInterval(updateClock, 15000);
+
+  function updateStepDurations(){
+    document.getElementById('subInhale').textContent = PHASES[0].duration + ' sec';
+    document.getElementById('subHold').textContent   = PHASES[1].duration + ' sec';
+    document.getElementById('subExhale').textContent = PHASES[2].duration + ' sec';
+  }
+
+  function setActiveStep(key){
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    if(!key) return;
+    const phase = PHASES.find(p=>p.key===key);
+    document.getElementById(phase.step).classList.add('active');
+  }
+
+  // ---- Card state switching (idle / running / result) ----
+  function showCard(state){
+    hcIdle.style.display    = state === 'idle'    ? 'flex' : 'none';
+    hcRunning.style.display = state === 'running' ? 'block' : 'none';
+    hcResult.style.display  = state === 'result'  ? 'block' : 'none';
+  }
+
+  // ---- Lung Health scoring ----
+  function computeHealthPercent(levelsFullyCompleted, repsInCurrentLevel){
+    let weighted = 0;
+    for(let i=0;i<levelsFullyCompleted;i++){
+      weighted += (i+1) * REPS_PER_LEVEL;
+    }
+    if(levelsFullyCompleted < LEVELS.length){
+      weighted += (levelsFullyCompleted+1) * repsInCurrentLevel;
+    }
+    const raw = weighted / MAX_WEIGHTED_SCORE; // 0..1
+    return Math.min(100, Math.round(40 + raw*60)); // floor 40%, ceiling 100%
+  }
+
+  function testProgressPercent(){
+    let weighted = 0;
+    for(let i=0;i<testLevelIndex;i++) weighted += (i+1)*REPS_PER_LEVEL;
+    weighted += (testLevelIndex+1) * testRep;
+    return Math.round((weighted/MAX_WEIGHTED_SCORE)*100);
+  }
+
+  // Emotion + tip copy, tuned to how far the person got
+  function getResultContent(pct){
+    if(pct < 55) return {
+      badge:'💙 Needs Practice',
+      text:"Don't worry — every pair of lungs gets stronger with practice. Start again from Level 1, keep your exhale slow and steady, and aim to finish at least 5 reps before stopping. A few minutes a day is all it takes to see your score climb."
+    };
+    if(pct < 70) return {
+      badge:'🌱 Building',
+      text:"You're building real lung strength. Try holding your breath a touch longer and keep your rhythm steady through the whole cycle — finishing one full level (10 reps) before stopping will lift your score noticeably next time."
+    };
+    if(pct < 85) return {
+      badge:'💪 Good',
+      text:"Nice control! Your lungs handled the pace well. Push a little further next time — reaching Level 4 or 5 counts for more and will carry you into Great territory."
+    };
+    if(pct < 95) return {
+      badge:'🔥 Great',
+      text:"Great job — you handled the longer, tougher levels with strong, controlled breathing. One more full level and you'll hit Excellent. Keep that steady rhythm going."
+    };
+    return {
+      badge:'🏆 Excellent',
+      text:"Outstanding! You completed the toughest levels with calm, controlled breathing from start to finish. Keep this routine a few times a week to maintain peak lung performance."
+    };
+  }
+
+  function showResult(pct, titleText){
+    healthFg.style.strokeDashoffset = HEALTH_CIRC * (1 - pct/100);
+    healthPctNum.textContent = pct + '%';
+    const content = getResultContent(pct);
+    hcBadge.textContent = content.badge;
+    hcResultTitle.textContent = titleText;
+    hcResultDesc.textContent = content.text;
+    showCard('result');
+  }
+
+  // ---- Phase visuals: one continuous animation across the full phase duration ----
+  function animatePhase(phase){
+    if(phase.key === 'inhale'){
+      ringFg.style.transitionDuration = phase.duration + 's';
+      ringFg.style.strokeDashoffset = 0;
+
+      lungsSvg.style.transitionDuration = phase.duration + 's';
+      lungsSvg.style.transform = 'scale(1.22) translateY(-10px)';
+      lungsSvg.style.filter = 'drop-shadow(0 0 36px rgba(62,230,224,0.8)) brightness(1.18)';
+      lungsWrap.style.zIndex = 5;
+
+      lungsGlow.style.transitionDuration = phase.duration + 's';
+      lungsGlow.style.opacity = 0.75;
+      lungsGlow.style.transform = 'translate(-50%,-50%) scale(1.15)';
+    } else if(phase.key === 'hold'){
+      ringFg.style.transitionDuration = '0s';
+      lungsSvg.style.transitionDuration = '0s';
+      lungsGlow.style.transitionDuration = '0s';
+      lungsWrap.style.zIndex = 5;
+    } else {
+      ringFg.style.transitionDuration = phase.duration + 's';
+      ringFg.style.strokeDashoffset = CIRC;
+
+      lungsSvg.style.transitionDuration = phase.duration + 's';
+      lungsSvg.style.transform = 'scale(0.85) translateY(8px)';
+      lungsSvg.style.filter = 'drop-shadow(0 0 12px rgba(62,230,224,0.28)) brightness(0.88)';
+      lungsWrap.style.zIndex = 1;
+
+      lungsGlow.style.transitionDuration = phase.duration + 's';
+      lungsGlow.style.opacity = 0.3;
+      lungsGlow.style.transform = 'translate(-50%,-50%) scale(0.7)';
+    }
+  }
+
+  function startPhase(index){
+    phaseIndex = index;
+    const phase = PHASES[phaseIndex];
+    secondsLeft = phase.duration;
+    phaseLabel.textContent = phase.label;
+    phaseSub.textContent = phase.sub;
+    phaseTimer.textContent = `${secondsLeft} sec`;
+    setActiveStep(phase.key);
+    animatePhase(phase);
+  }
+
+  function idleVisuals(){
+    ringFg.style.transitionDuration = '.6s';
+    ringFg.style.strokeDashoffset = CIRC;
+
+    lungsSvg.style.transitionDuration = '.6s';
+    lungsSvg.style.transform = 'scale(0.85) translateY(6px)';
+    lungsSvg.style.filter = 'drop-shadow(0 0 14px rgba(62,230,224,0.3)) brightness(0.9)';
+    lungsWrap.style.zIndex = 1;
+
+    lungsGlow.style.transitionDuration = '.6s';
+    lungsGlow.style.opacity = 0.35;
+    lungsGlow.style.transform = 'translate(-50%,-50%) scale(0.75)';
+
+    setActiveStep(null);
+  }
+
+  function tick(){
+    secondsLeft -= 1;
+    if(secondsLeft <= 0){
+      const next = (phaseIndex + 1) % PHASES.length;
+
+      if(next === 0){
+        // a full inhale-hold-exhale cycle just finished
+        if(testMode){
+          testRep++;
+          if(testRep >= REPS_PER_LEVEL){
+            testLevelIndex++;
+            testRep = 0;
+            if(testLevelIndex >= LEVELS.length){
+              completeTest();
+              return;
+            }
+            currentLevel = testLevelIndex;
+            PHASES = buildPhases(currentLevel);
+            updateStepDurations();
+            levelSelect.value = currentLevel;
+          }
+          liveLevel.textContent = testLevelIndex + 1;
+          liveReps.textContent = testRep;
+          hcBarFill.style.width = testProgressPercent() + '%';
+        }
+      }
+      startPhase(next);
+    } else {
+      phaseTimer.textContent = `${secondsLeft} sec`;
+    }
+  }
+
+  function startSession(){
+    running = true;
+    sessionBtn.innerHTML = '⏸ Pause Session';
+    startPhase(0);
+    tickHandle = setInterval(tick, 1000);
+  }
+
+  function pauseSession(){
+    running = false;
+    sessionBtn.innerHTML = '▶ Resume Session';
+    clearInterval(tickHandle);
+  }
+
+  function resetSession(){
+    clearInterval(tickHandle);
+    running = false;
+    phaseIndex = -1;
+    secondsLeft = 0;
+    sessionBtn.innerHTML = '▶ Start Session';
+    phaseLabel.textContent = 'Ready';
+    phaseSub.textContent = 'Select a level & tap start';
+    phaseTimer.textContent = '-- sec';
+    idleVisuals();
+  }
+
+  // ---- Auto Level Test controls ----
+  function startTest(){
+    testMode = true;
+    testLevelIndex = 0;
+    testRep = 0;
+    currentLevel = 0;
+    PHASES = buildPhases(currentLevel);
+    updateStepDurations();
+    levelSelect.value = 0;
+    levelSelect.disabled = true;
+    sessionBtn.disabled = true;
+
+    liveLevel.textContent = 1;
+    liveReps.textContent = 0;
+    hcBarFill.style.width = '0%';
+    showCard('running');
+
+    running = true;
+    startPhase(0);
+    tickHandle = setInterval(tick, 1000);
+  }
+
+  function endTestEngine(){
+    testMode = false;
+    clearInterval(tickHandle);
+    running = false;
+    sessionBtn.disabled = false;
+    levelSelect.disabled = false;
+    idleVisuals();
+    phaseLabel.textContent = 'Ready';
+    phaseSub.textContent = 'Select a level & tap start';
+    phaseTimer.textContent = '-- sec';
+  }
+
+  function stopTestManually(){
+    const pct = computeHealthPercent(testLevelIndex, testRep);
+    const title = `Stopped at Level ${testLevelIndex+1} • Rep ${testRep}/${REPS_PER_LEVEL}`;
+    endTestEngine();
+    showResult(pct, title);
+  }
+
+  function completeTest(){
+    endTestEngine();
+    showResult(100, `All 5 levels complete 🎉`);
+  }
+
+  sessionBtn.addEventListener('click', () => {
+    if(!running){
+      startSession();
+    } else {
+      pauseSession();
+    }
+  });
+
+  resetBtn.addEventListener('click', () => {
+    if(testMode){
+      endTestEngine();
+    }
+    currentLevel = 2;
+    PHASES = buildPhases(currentLevel);
+    updateStepDurations();
+    levelSelect.value = 2;
+    resetSession();
+    showCard('idle');
+  });
+
+  levelSelect.addEventListener('change', (e) => {
+    currentLevel = parseInt(e.target.value, 10);
+    PHASES = buildPhases(currentLevel);
+    updateStepDurations();
+    resetSession();
+  });
+
+  hcIdle.addEventListener('click', startTest);
+  stopTestBtn.addEventListener('click', stopTestManually);
+  retryBtn.addEventListener('click', startTest);
+
+  updateStepDurations();
+  resetSession();
+  showCard('idle');
+</script>
+
+</body>
+</html>
