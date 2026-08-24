@@ -335,22 +335,26 @@
     display:flex;
     gap:10px;
   }
-  .reset-btn{
-    margin:0px;
-    padding:0px;
-    width:54px;
-    hight:54px;
-    flex-shrink:0;
-    border:1px solid rgba(255,255,255,0.14);
-    border-radius:50%;
-    background:rgba(255,255,255,0.05);
-    color:#cfe0ff;
-    font-size:50px;
-    cursor:pointer;
-    transition:transform .15s, background .2s;
-  }
-  .reset-btn:hover{ background:rgba(255,255,255,0.12); }
-  .reset-btn:active{ transform:scale(0.94) rotate(-90deg); }
+.reset-btn{
+  margin:0;
+  padding:0;
+  width:54px;
+  height:54px;                 /* fixed typo (was "hight") */
+  display:inline-grid;         /* centers the inner icon reliably */
+  place-items:center;
+  flex-shrink:0;
+  border:1px solid rgba(255,255,255,0.14);
+  border-radius:50%;
+  background:rgba(255,255,255,0.05);
+  color:#cfe0ff;
+  font-size:20px;              /* scale down from 50px to fit the 54px button */
+  line-height:1;
+  cursor:pointer;
+  transition:transform .15s, background .2s;
+}
+.reset-btn:hover{ background:rgba(255,255,255,0.12); }
+.reset-btn:active{ transform:scale(0.94) rotate(-90deg); }
+.reset-btn:focus{ outline:2px solid rgba(62,230,224,0.25); outline-offset:2px; }
 
   .session-btn{
     flex:1;
