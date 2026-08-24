@@ -26,7 +26,7 @@
   }
 
   .phone{
-    hight:100vh;
+    
     width:390px;
     max-width:100%;
     border-radius:44px;
@@ -588,14 +588,7 @@
   let testLevelIndex = 0; // level currently being practiced during the test (0-based)
   let testRep = 0;        // reps completed so far within that level (0-9)
 
-  function updateClock(){
-    const now = new Date();
-    let h = now.getHours() % 12; if(h===0) h = 12;
-    const m = now.getMinutes().toString().padStart(2,'0');
-    clockEl.textContent = `${h}:${m}`;
-  }
-  updateClock();
-  setInterval(updateClock, 15000);
+  
 
   function updateStepDurations(){
     document.getElementById('subInhale').textContent = PHASES[0].duration + ' sec';
