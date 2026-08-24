@@ -443,7 +443,7 @@
                 stroke-dasharray="628.3" stroke-dashoffset="628.3"></circle>
       </svg>
       <div class="ring-center">
-        <div class="ring-icon">💨</div>
+        <div class="ring-icon">🧘🏻</div>
         <div class="phase-label" id="phaseLabel">Ready</div>
         <div class="phase-sub" id="phaseSub">Select a level & tap start</div>
         <div class="phase-timer" id="phaseTimer">-- sec</div>
@@ -475,7 +475,7 @@
         <div class="hc-idle-icon">🫁</div>
         <div class="hc-idle-text">
           <h3>Test Your Lungs</h3>
-          <p>Auto test runs all 5 levels, 10 reps each, then scores your lung health.</p>
+          <p>Auto test runs all 5 levels, 10 reps.</p>
         </div>
         <div class="hc-idle-cta">▶ Start</div>
       </div>
@@ -487,7 +487,7 @@
           <div class="hc-stat"><span class="hc-stat-num" id="liveReps">0</span><span class="hc-stat-label">/ 10 Reps</span></div>
         </div>
         <div class="hc-bar"><div class="hc-bar-fill" id="hcBarFill"></div></div>
-        <button class="hc-stop-btn" id="stopTestBtn">⏹ Stop Test</button>
+        <button class="hc-stop-btn" id="stopTestBtn"> Stop Test</button>
       </div>
 
       <div class="hc-result" id="hcResult">
@@ -769,14 +769,14 @@
 
   function startSession(){
     running = true;
-    sessionBtn.innerHTML = '⏸ Pause Session';
+    sessionBtn.innerHTML = ' Pause Session';
     startPhase(0);
     tickHandle = setInterval(tick, 1000);
   }
 
   function pauseSession(){
     running = false;
-    sessionBtn.innerHTML = '▶ Resume Session';
+    sessionBtn.innerHTML = ' Resume Session';
     clearInterval(tickHandle);
   }
 
